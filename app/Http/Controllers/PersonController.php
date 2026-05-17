@@ -35,7 +35,7 @@ class PersonController extends Controller
         ]);
 
         $input['interests'] = implode(', ', $request->input('interests', []));
-
+        $input['user_id'] = auth()->user()->id;
         $person = Person::create($input);
         Mail::to($input['email_address'])->send(new PersonAdded($person));
         return redirect()->route('people.index')->with('success', 'New person added!');

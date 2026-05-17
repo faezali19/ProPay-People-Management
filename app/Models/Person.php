@@ -10,6 +10,7 @@ class Person extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'name',
         'surname',
         'sa_id_number',
@@ -19,4 +20,9 @@ class Person extends Model
         'language',
         'interests',
     ];
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }
