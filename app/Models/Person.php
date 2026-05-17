@@ -11,18 +11,34 @@ class Person extends Model
 
     protected $fillable = [
         'user_id',
+        'language_id',
         'name',
         'surname',
-        'sa_id_number',
-        'mobile_number',
-        'email_address',
         'birth_date',
-        'language',
-        'interests',
     ];
 
-    public function creator()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
+    }
+
+    public function language()
+    {
+        return $this->belongsTo(Language::class);
+    }
+
+    public function contactDetail()
+    {
+        return $this->hasOne(ContactDetail::class);
+    }
+
+    public function identityDocument()
+    {
+        return $this->hasOne(IdentityDocument::class);
+    }
+
+    public function interests()
+    {
+        return $this->belongsToMany(Interest::class, 'person_interest');
     }
 }

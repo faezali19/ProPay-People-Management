@@ -2,97 +2,77 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Services\PersonService;
+use App\Models\Language;
+use App\Models\Interest;
 use Illuminate\Http\Request;
-use App\Models\Person;
-use App\Mail\PersonAdded;
-use Illuminate\Support\Facades\Mail;
 
 class PersonController extends Controller
 {
+    public function __construct(protected PersonService $personService) {}
+
     public function index()
     {
-        $people = Person::latest()->paginate(15); // this shows the latest added people first and paginates the results to 20 per page.
-        return view('people.index', ['people' => $people]);
+        $people = $this->personService->getAllPeople();
+        return view('people.index', compact('people'));
     }
 
     public function create()
     {
-        return view('people.create');
+        $languages = Language::all();
+        $interests = Interest::all();
+        return view('people.create', compact('languages', 'interests'));
     }
 
     public function store(Request $request)
     {
-        $input = $request->validate([
-            'name' => 'required|max:255',
-            'surname' => 'required|max:255',
-            'sa_id_number' => 'required|digits:13|unique:people',
+        $data = $request->validate([
+            'name'          => 'required|max:255',
+            'surname'       => 'required|max:255',
+            'sa_id_number'  => 'required|digits:13|unique:identity_documents',
             'mobile_number' => 'required|digits:10',
-            'email_address' => 'required|email|max:255|unique:people',
-            'birth_date' => 'required|date',
-            'language' => 'required|max:255',
-            'interests' => 'nullable',
+            'email_address' => 'required|email|max:255|unique:contact_details',
+            'birth_date'    => 'required|date',
+            'language_id'   => 'required|exists:languages,id',
+            'interests'     => 'nullable|array',
+            'interests.*'   => 'exists:interests,id',
         ]);
 
-        $input['interests'] = implode(', ', $request->input('interests', []));
-        $input['user_id'] = auth()->user()->id;
-        $person = Person::create($input);
-        Mail::to($input['email_address'])->send(new PersonAdded($person));
+        $this->personService->createPerson($data);
+
         return redirect()->route('people.index')->with('success', 'New person added!');
     }
 
-    public function edit(string $id)
+    public function edit(int $id)
     {
-        $person = Person::find($id);
-        if (!$person)
-        {
-            return redirect()->route('people.index')->with('error', 'Person not found!');
-        }
-        return view('people.edit', ['person' => $person]);
+        $person    = $this->personService->findPerson($id);
+        $languages = Language::all();
+        $interests = Interest::all();
+        return view('people.edit', compact('person', 'languages', 'interests'));
     }
 
-    public function update(Request $request, string $id)
+    public function update(Request $request, int $id)
     {
-        $person = Person::find($id);
-        if (!$person)
-        {
-            return redirect()->route('people.index')->with('error', 'Person not found!');
-        }
-            $input = $request->validate([
-            'name' => 'required|max:255',
-            'surname' => 'required|max:255',
-            'sa_id_number' => 'required|digits:13|unique:people,sa_id_number,'.$id,
+        $data = $request->validate([
+            'name'          => 'required|max:255',
+            'surname'       => 'required|max:255',
+            'sa_id_number'  => 'required|digits:13|unique:identity_documents,sa_id_number,' . $id . ',person_id',
             'mobile_number' => 'required|digits:10',
-            'email_address' => 'required|email|max:255|unique:people,email_address,'.$id,
-            'birth_date' => 'required|date',
-            'language' => 'required|max:255',
-            'interests' => 'nullable',
+            'email_address' => 'required|email|max:255|unique:contact_details,email_address,' . $id . ',person_id',
+            'birth_date'    => 'required|date',
+            'language_id'   => 'required|exists:languages,id',
+            'interests'     => 'nullable|array',
+            'interests.*'   => 'exists:interests,id',
         ]);
 
-        $input['interests'] = implode(', ', $request->input('interests', []));
-        $person->update($input);
+        $this->personService->updatePerson($id, $data);
+
         return redirect()->route('people.index')->with('success', 'Person updated!');
     }
 
-    public function destroy(string $id)
+    public function destroy(int $id)
     {
-        $person = Person::find($id);
-        if (!$person) 
-        {
-            return redirect()->route('people.index')->with('error', 'Person not found!');
-        }
-
-        // logging the deletion before removing from database
-        \Log::info('Person deleted', [
-            'deleted_by' => auth()->user()->name,
-            'person_name' => $person->name . ' ' . $person->surname,
-            'person_email' => $person->email_address,
-            'sa_id' => $person->sa_id_number,
-            'deleted_at' => now()->toDateTimeString(),
-        ]);
-
-        $name = $person->name . ' ' . $person->surname;
-        $person->delete();
+        $name = $this->personService->deletePerson($id);
         return redirect()->route('people.index')->with('success', $name . ' was removed from the system.');
     }
 }

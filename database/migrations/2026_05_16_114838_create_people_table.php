@@ -10,18 +10,15 @@ return new class extends Migration
     {
         Schema::create('people', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('language_id')->nullable()->constrained()->onDelete('set null');
             $table->string('name');
             $table->string('surname');
-            $table->string('sa_id_number');
-            $table->string('mobile_number');
-            $table->string('email_address');
             $table->date('birth_date');
-            $table->string('language');
-            $table->text('interests');
             $table->timestamps();
         });
     }
+
     public function down(): void
     {
         Schema::dropIfExists('people');
