@@ -49,4 +49,14 @@ class PersonRepository implements PersonRepositoryInterface
         $person = $this->findById($id);
         return $person->delete();
     }
+
+    public function getAllLanguages()
+    {
+        return \App\Models\Language::all();
+    }
+
+    public function getAllInterests()
+    {
+        return \App\Models\Interest::all();
+    }
 }

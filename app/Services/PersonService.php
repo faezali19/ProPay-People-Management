@@ -84,4 +84,14 @@ class PersonService
 
         return $name;
     }
+
+    public function getAllLanguages()
+    {
+        return $this->personRepository->getAllLanguages();
+    }
+
+    public function getAllInterests()
+    {
+        return $this->personRepository->getAllInterests();
+    }
 }

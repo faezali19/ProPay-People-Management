@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Services\PersonService;
-use App\Models\Language;
-use App\Models\Interest;
 use Illuminate\Http\Request;
+use App\Http\Requests\StorePersonRequest;
+use App\Http\Requests\UpdatePersonRequest;
 
 class PersonController extends Controller
 {
@@ -19,24 +19,14 @@ class PersonController extends Controller
 
     public function create()
     {
-        $languages = Language::all();
-        $interests = Interest::all();
+        $languages = $this->personService->getAllLanguages();
+        $interests  = $this->personService->getAllInterests();
         return view('people.create', compact('languages', 'interests'));
     }
 
-    public function store(Request $request)
+    public function store(StorePersonRequest $request)
     {
-        $data = $request->validate([
-            'name'          => 'required|max:255',
-            'surname'       => 'required|max:255',
-            'sa_id_number'  => 'required|digits:13|unique:identity_documents',
-            'mobile_number' => 'required|digits:10',
-            'email_address' => 'required|email|max:255|unique:contact_details',
-            'birth_date'    => 'required|date',
-            'language_id'   => 'required|exists:languages,id',
-            'interests'     => 'nullable|array',
-            'interests.*'   => 'exists:interests,id',
-        ]);
+        $data = $request->validated();
 
         $this->personService->createPerson($data);
 
@@ -46,24 +36,15 @@ class PersonController extends Controller
     public function edit(int $id)
     {
         $person    = $this->personService->findPerson($id);
-        $languages = Language::all();
-        $interests = Interest::all();
+        $languages = $this->personService->getAllLanguages();
+        $interests  = $this->personService->getAllInterests();
         return view('people.edit', compact('person', 'languages', 'interests'));
     }
 
-    public function update(Request $request, int $id)
+
+    public function update(UpdatePersonRequest $request, int $id)
     {
-        $data = $request->validate([
-            'name'          => 'required|max:255',
-            'surname'       => 'required|max:255',
-            'sa_id_number'  => 'required|digits:13|unique:identity_documents,sa_id_number,' . $id . ',person_id',
-            'mobile_number' => 'required|digits:10',
-            'email_address' => 'required|email|max:255|unique:contact_details,email_address,' . $id . ',person_id',
-            'birth_date'    => 'required|date',
-            'language_id'   => 'required|exists:languages,id',
-            'interests'     => 'nullable|array',
-            'interests.*'   => 'exists:interests,id',
-        ]);
+        $data = $request->validated();
 
         $this->personService->updatePerson($id, $data);
 

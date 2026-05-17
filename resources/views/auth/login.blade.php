@@ -2,91 +2,41 @@
 <html>
 <head>
     <title>ProPay | Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #1a1a2e;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .login-card {
-            background: white;
-            border-radius: 12px;
-            padding: 40px;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        }
-        .brand-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .brand-header h2 {
-            color: #1a1a2e;
-            font-weight: 700;
-            font-size: 28px;
-        }
-        .brand-header span {
-            color: #e63946;
-        }
-        .brand-header p {
-            color: #666;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-        .btn-login {
-            background-color: #1a1a2e;
-            color: white;
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-        .btn-login:hover {
-            background-color: #e63946;
-            color: white;
-        }
-        .form-control:focus {
-            border-color: #1a1a2e;
-            box-shadow: 0 0 0 0.2rem rgba(26,26,46,0.15);
-        }
-        label {
-            font-weight: 600;
-            color: #333;
-            font-size: 14px;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="login-card">
-        <div class="brand-header">
-            <h2>Pro<span>Pay</span> SA</h2>
-            <p>People Management System</p>
+<body class="min-h-screen flex items-center justify-center" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)">
+
+    <div class="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-md">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-[#1a1a2e]">Pro<span class="text-[#e63946]">Pay</span> SA</h1>
+            <p class="text-gray-500 text-sm mt-2">People Management System</p>
         </div>
 
         @if($errors->any())
-            <div class="alert alert-danger">
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 text-sm">
                 @foreach($errors->all() as $error)
-                    <p class="mb-0">{{ $error }}</p>
+                    <p>{{ $error }}</p>
                 @endforeach
             </div>
         @endif
 
         <form method="POST" action="{{ route('login') }}">
             @csrf
-            <div class="mb-3">
-                <label>Email Address</label>
-                <input type="email" name="email" class="form-control" value="{{ old('email') }}" placeholder="Enter your email">
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Email Address</label>
+                <input type="email" name="email" value="{{ old('email') }}" placeholder="Enter your email"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#1a1a2e]">
             </div>
-            <div class="mb-3">
-                <label>Password</label>
-                <input type="password" name="password" class="form-control" placeholder="Enter your password">
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+                <input type="password" name="password" placeholder="Enter your password"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#1a1a2e]">
             </div>
-            <button type="submit" class="btn btn-login mt-2">Login</button>
+            <button type="submit" class="w-full bg-[#1a1a2e] hover:bg-[#e63946] text-white py-3 rounded-lg text-sm font-semibold transition">
+                Login
+            </button>
         </form>
     </div>
+
 </body>
 </html>
